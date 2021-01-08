@@ -47,8 +47,8 @@ func getArrayOfDays() -> [String] {
 }
 
 func getWeatherData() -> [FormedWeatherObjectForDisplay] {
-    let stuff = DataManager().getOtherStuff()
-    return DataHandler().makeSenseOfData(from: stuff!)
+    let jsonData = DataManager().getOtherStuff()
+    return DataHandler().makeSenseOfData(from: jsonData!)
     
 }
 
@@ -64,7 +64,7 @@ struct WeatherWeekView: View {
             /// pulls the second to the last elements out of the array to put in the week view
             ForEach((1..<6), id: \.self) {
                 WeatherDayView(dayOfWeek: daysOfWeek[$0],
-                               imageName: "cloud.sun.fill",
+                               imageName: weatherData[$0].weatherIconName,
                                temperature: Int(weatherData[$0].temp))
             }
         }

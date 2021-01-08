@@ -10,13 +10,20 @@ import Foundation
 struct FormedWeatherObjectForDisplay {
     var temp: Double = 0.0
     var dayString: String
-    var weatherDescriptor: String = ""
+    
+    var weatherDescriptor: String?  {
+        didSet {
+            weatherIconName = selectWeatherIcon(from: weatherDescriptor ?? "unknown")
+        }
+    }
+    var weatherIconName: String = weatherIcons.unknown
     var arrayOfWeatherDescriptors: [String] = []
     
     var arrayOfTemps: [Double] = [] {
         didSet {
             /// sets the temp to be the average of the array of temperatures
-            self.temp = arrayOfTemps.reduce(0, +)/Double(arrayOfTemps.count)
+            self.temp = arrayOfTemps.max()!
+            //self.temp = arrayOfTemps.reduce(0, +)/Double(arrayOfTemps.count)
         }
     }
     
@@ -25,8 +32,27 @@ struct FormedWeatherObjectForDisplay {
         temp = temp.rounded(toPlaces: 0)
     }
     
-    func allocateWeatherDescriptor() {
-        print("lol")
+    /// goes through the list of weather descriptors, creates a dictionary of the items and their frequencies, finds the pair with the highest frequency, then returns the key from that pair
+    mutating func allocateWeatherDescriptor() {
+        let mappedWeatherDescriptors = arrayOfWeatherDescriptors.map{($0, 1)}
+        let counts = Dictionary(mappedWeatherDescriptors, uniquingKeysWith: +)
+        let foundWeatherDescriptor = counts.max{a,b in a.value < b.value}
+        weatherDescriptor = foundWeatherDescriptor?.key
+    }
+    
+    func selectWeatherIcon(from descriptor: String) -> String {
+        switch descriptor.lowercased() {
+        case "clouds":
+            return weatherIcons.clouds
+        case "rain":
+            return weatherIcons.rain
+        case "clear":
+            return weatherIcons.clear
+
+        default:
+            print("weather descriptor unknown: \(descriptor)")
+            return weatherIcons.unknown
+        }
     }
     
     
